@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useChatStore } from '../store/useChatStore';
 import { COLORS, FONTS } from '../theme/colors';
 
@@ -144,11 +145,14 @@ export default function Header() {
             <Text style={styles.historyTitle}>Chat History</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <TouchableOpacity onPress={async () => {
-                const FileSystem = require('expo-file-system/legacy');
-                const path = `${FileSystem.documentDirectory}rapid_model_q4_k_m.gguf`;
-                await FileSystem.deleteAsync(path, { idempotent: true });
-                useChatStore.getState().setModelStatus('missing');
-                Alert.alert('Engine Reset', 'The offline model has been deleted and will re-download on next prompt.');
+                try {
+                  const path = `${FileSystem.documentDirectory}rapid_model_q4_k_m.gguf`;
+                  await FileSystem.deleteAsync(path, { idempotent: true });
+                  useChatStore.getState().setModelStatus('missing');
+                  Alert.alert('Engine Reset', 'The offline model has been deleted and will re-download on next prompt.');
+                } catch (e) {
+                  Alert.alert('Error', 'Failed to delete file: ' + e.message);
+                }
               }} style={{marginRight: 16}}>
                 <Text style={[styles.historyCloseText, {color: COLORS.textSecondary}]}>Reset Engine</Text>
               </TouchableOpacity>
@@ -167,13 +171,24 @@ export default function Header() {
               const isActive = item.id === activeSessionId;
               
               return (
-                <TouchableOpacity 
-                  style={[styles.historyItem, isActive && styles.historyItemActive]}
-                  onPress={() => loadSession(item.id)}
-                >
-                  <Text style={styles.historyItemDate}>{date}</Text>
-                  <Text style={styles.historyItemSnippet}>{snippet}</Text>
-                </TouchableOpacity>
+                <View style={[styles.historyItem, isActive && styles.historyItemActive]}>
+                  <TouchableOpacity 
+                    style={{ flex: 1 }}
+                    onPress={() => loadSession(item.id)}
+                  >
+                    <Text style={styles.historyItemDate}>{date}</Text>
+                    <Text style={styles.historyItemSnippet}>{snippet}</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    onPress={() => {
+                      useChatStore.getState().deleteSession(item.id);
+                    }}
+                    style={{ padding: 8, justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: 'red', fontFamily: FONTS.ui }}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
               );
             }}
             ListEmptyComponent={
@@ -345,9 +360,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   historyItem: {
+    flexDirection: 'row',
     padding: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: COLORS.border,
+    alignItems: 'center',
   },
   historyItemActive: {
     backgroundColor: '#F9F9F9',

@@ -70,6 +70,26 @@ export const useChatStore = create(
           [state.activeSessionId]: { id: state.activeSessionId, messages: [] }
         }
       })),
+      
+      deleteSession: (sessionId) => set((state) => {
+        const newSessions = { ...state.chatSessions };
+        delete newSessions[sessionId];
+        
+        let newActiveId = state.activeSessionId;
+        let newMessages = state.messages;
+        
+        if (sessionId === state.activeSessionId) {
+          newActiveId = Date.now().toString();
+          newMessages = [];
+          newSessions[newActiveId] = { id: newActiveId, messages: [] };
+        }
+        
+        return {
+          chatSessions: newSessions,
+          activeSessionId: newActiveId,
+          messages: newMessages
+        };
+      }),
     }),
     {
       name: 'hybrid-chat-storage-v3', // bumped version to avoid hydration conflicts
