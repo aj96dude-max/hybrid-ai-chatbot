@@ -4,15 +4,19 @@ import { useChatStore } from '../store/useChatStore';
 import { COLORS, FONTS } from '../theme/colors';
 
 export default function Header() {
-  const { mode, setMode } = useChatStore();
+  const mode = useChatStore((state) => state.mode);
+  const setMode = useChatStore((state) => state.setMode);
 
   return (
     <View style={styles.container}>
       <View style={styles.segmentedControl}>
         <TouchableOpacity 
           style={[styles.segment, mode === 'rapid' && styles.segmentActive]} 
-          onPress={() => setMode('rapid')}
-          activeOpacity={0.8}
+          onPress={() => {
+            console.log("Setting mode to rapid");
+            setMode('rapid');
+          }}
+          activeOpacity={0.6}
         >
           <Text style={[styles.segmentText, mode === 'rapid' && styles.segmentTextActive]}>Rapid</Text>
         </TouchableOpacity>
@@ -21,8 +25,11 @@ export default function Header() {
         
         <TouchableOpacity 
           style={[styles.segment, mode === 'pro' && styles.segmentActive]} 
-          onPress={() => setMode('pro')}
-          activeOpacity={0.8}
+          onPress={() => {
+            console.log("Setting mode to pro");
+            setMode('pro');
+          }}
+          activeOpacity={0.6}
         >
           <Text style={[styles.segmentText, mode === 'pro' && styles.segmentTextActive]}>Pro</Text>
         </TouchableOpacity>
