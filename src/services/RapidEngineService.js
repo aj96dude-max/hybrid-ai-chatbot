@@ -12,11 +12,13 @@ export const RapidEngineService = {
       throw new Error('Model is not downloaded.');
     }
 
-    const path = ModelManagerService.getModelPath();
+    const uriPath = ModelManagerService.getModelPath();
+    // Strip the 'file://' prefix for the C++ backend
+    const rawPath = uriPath.replace(/^file:\/\//, '');
     
     // Hardware accelerated inference via llama.cpp
     llamaContext = await LlamaContext.create({
-      model: path,
+      model: rawPath,
       contextSize: 2048,
     });
     
