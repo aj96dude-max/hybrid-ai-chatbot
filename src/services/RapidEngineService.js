@@ -13,15 +13,21 @@ export const RapidEngineService = {
     }
 
     const uriPath = ModelManagerService.getModelPath();
-    // Strip the 'file://' prefix but carefully leave EXACTLY one leading slash for Android absolute paths
     const rawPath = uriPath.replace('file://', '');
     
+    // VERIFY EXACT FILE SIZE BEFORE INITIALIZING
+    const FileSystem = require('expo-file-system/legacy');
+    const info = await FileSystem.getInfoAsync(uriPath);
+    if (!info.exists || info.size < 390 * 1024 * 1024) {
+      throw new Error(`Model corrupted. Size is only ${Math.round((info.size || 0)/1024/1024)}MB. Please tap Reset Engine and re-download.`);
+    }
+
     // Hardware accelerated inference via llama.cpp
     llamaContext = await initLlama({
       model: rawPath,
-      contextSize: 1024, // Lowered from 2048 to prevent OOM
-      use_mlock: true,   // Lock model in RAM to prevent swapping
-      n_gpu_layers: 0,   // Force CPU execution to prevent GPU OOM on low-end Androids
+      contextSize: 512,  // Ultra-safe context size
+      n_gpu_layers: 0,   // Force CPU
+      // DO NOT USE use_mlock ON ANDROID (it causes fatal crashes)
     });
     
     return true;
