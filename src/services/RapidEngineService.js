@@ -26,9 +26,11 @@ export const RapidEngineService = {
     // Hardware accelerated inference via llama.cpp
     llamaContext = await initLlama({
       model: rawPath,
-      contextSize: 512,  // Ultra-safe context size
-      n_gpu_layers: 0,   // Force CPU
-      // DO NOT USE use_mlock ON ANDROID (it causes fatal crashes)
+      contextSize: 512,  
+      n_ctx: 512,        // In case the native bridge expects n_ctx directly
+      n_gpu_layers: 0,   
+      use_mlock: false,  // EXPLICITLY set to false (defaults to true natively and crashes Android!)
+      use_mmap: false    // EXPLICITLY set to false (memory mapping can fail on strict Android OEMs)
     });
     
     return true;
