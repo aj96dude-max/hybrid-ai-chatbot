@@ -137,3 +137,71 @@
 {"_e":"devserver:start","_t":1790599943681,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
 {"_e":"metro:config","_t":1790599944159,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
 {"_e":"expo:dev-tools-plugin:load","_t":1790599944601,"plugins":[]}
+{"_e":"metro:instantiate","_t":1790599951446,"atlas":false,"workers":6,"host":"::","port":8082}
+{"_e":"metro:bundling:started","_t":1790600047259,"id":"1","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600047259,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790600047263,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790600047363,"id":"1","progress":0.06320027464810712,"total":179,"current":45}
+{"_e":"metro:bundling:progress","_t":1790600047463,"id":"1","progress":0.3304294506918413,"total":294,"current":169}
+{"_e":"metro:bundling:progress","_t":1790600047563,"id":"1","progress":0.34050029062308546,"total":437,"current":255}
+{"_e":"metro:bundling:progress","_t":1790600047663,"id":"1","progress":0.6835023283361883,"total":531,"current":439}
+{"_e":"metro:bundling:progress","_t":1790600047772,"id":"1","progress":0.7659890199639536,"total":601,"current":526}
+{"_e":"metro:bundling:progress","_t":1790600047885,"id":"1","progress":0.8884514590149785,"total":714,"current":673}
+{"_e":"metro:bundling:progress","_t":1790600047993,"id":"1","progress":0.9973208317460773,"total":746,"current":745}
+{"_e":"metro:bundling:progress","_t":1790600048153,"id":"1","progress":0.999,"total":746,"current":746}
+{"_e":"metro:bundling:progress","_t":1790600048257,"id":"1","progress":0.999,"total":757,"current":747}
+{"_e":"metro:bundling:progress","_t":1790600048377,"id":"1","progress":0.999,"total":760,"current":748}
+{"_e":"metro:bundling:progress","_t":1790600048435,"id":"1","progress":0.999,"total":760,"current":749}
+{"_e":"metro:bundling:progress","_t":1790600048540,"id":"1","progress":0.999,"total":763,"current":750}
+{"_e":"metro:bundling:progress","_t":1790600048651,"id":"1","progress":0.999,"total":765,"current":755}
+{"_e":"metro:bundling:progress","_t":1790600048751,"id":"1","progress":0.999,"total":765,"current":760}
+{"_e":"metro:bundling:progress","_t":1790600048852,"id":"1","progress":0.999,"total":778,"current":766}
+{"_e":"metro:bundling:progress","_t":1790600048961,"id":"1","progress":0.999,"total":779,"current":774}
+{"_e":"metro:bundling:progress","_t":1790600049065,"id":"1","progress":0.999,"total":781,"current":776}
+{"_e":"metro:bundling:progress","_t":1790600049261,"id":"1","progress":0.999,"total":781,"current":777}
+{"_e":"metro:bundling:progress","_t":1790600049370,"id":"1","progress":0.999,"total":781,"current":781}
+{"_e":"metro:bundling:done","_t":1790600049428,"id":"1","total":781,"ms":2168.8255}
+{"_e":"metro:bundling:started","_t":1790600058482,"id":"2","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600058482,"id":"2","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790600058483,"id":"2","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600058520,"id":"2","total":1,"ms":37.6261}
+{"_e":"metro:bundling:started","_t":1790600223076,"id":"3","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600223076,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790600223077,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600223138,"id":"3","total":1,"ms":62.0137}
+{"_e":"metro:client_log","_t":1790600226029,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:client_log","_t":1790600244462,"level":"error","data":["Pro Engine Error:","[Error: Pro API Error: 401]"]}
+{"_e":"metro:bundling:started","_t":1790600257477,"id":"6","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600257477,"id":"6","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600257513,"id":"6","total":1,"ms":36.0298}
+{"_e":"metro:client_log","_t":1790600262362,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:client_log","_t":1790600270770,"level":"error","data":["Pro Engine Error:","[Error: Pro API Error: 401]"]}
+{"_e":"metro:bundling:started","_t":1790600476619,"id":"8","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600476619,"id":"8","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790600476620,"id":"8","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600476688,"id":"8","total":1,"ms":68.9288}
+{"_e":"metro:client_log","_t":1790600479510,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600483729,"id":"9","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600483729,"id":"9","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600483762,"id":"9","total":1,"ms":33.5007}
+{"_e":"metro:client_log","_t":1790600486729,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600498953,"id":"a","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600498953,"id":"a","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600498988,"id":"a","total":1,"ms":34.4078}
+{"_e":"metro:client_log","_t":1790600501876,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600526444,"id":"b","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600526444,"id":"b","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600526480,"id":"b","total":1,"ms":36.2043}
+{"_e":"metro:client_log","_t":1790600530224,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600553649,"id":"c","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600553649,"id":"c","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600553687,"id":"c","total":1,"ms":37.4414}
+{"_e":"metro:client_log","_t":1790600557150,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600564014,"id":"d","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600564014,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600564049,"id":"d","total":1,"ms":34.6643}
+{"_e":"metro:client_log","_t":1790600567278,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:bundling:started","_t":1790600579203,"id":"e","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790600579203,"id":"e","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790600579239,"id":"e","total":1,"ms":35.8474}
+{"_e":"metro:client_log","_t":1790600582834,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
