@@ -1,5 +1,6 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Header from './src/components/Header';
 import ChatList from './src/components/ChatList';
 import InputBar from './src/components/InputBar';
@@ -8,16 +9,18 @@ import { COLORS } from './src/theme/colors';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        style={styles.keyboardView} 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <Header />
-        <ChatList />
-        <InputBar />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <KeyboardAvoidingView 
+          style={styles.keyboardView} 
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Header />
+          <ChatList />
+          <InputBar />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
