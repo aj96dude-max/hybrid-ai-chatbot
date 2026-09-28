@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useChatStore } from '../store/useChatStore';
 
 // URL for a lightweight quantised model. This is an example placeholder.
