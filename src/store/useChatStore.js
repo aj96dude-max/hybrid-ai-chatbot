@@ -78,7 +78,6 @@ export const useChatStore = create(
         chatSessions: state.chatSessions,
         activeSessionId: state.activeSessionId,
         messages: state.messages,
-        proApiKey: state.proApiKey,
         mode: state.mode
       }),
     }

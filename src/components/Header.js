@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { useChatStore } from '../store/useChatStore';
 import { COLORS, FONTS } from '../theme/colors';
 
@@ -8,10 +9,24 @@ export default function Header() {
   const setMode = useChatStore((state) => state.setMode);
   const proApiKey = useChatStore((state) => state.proApiKey);
   const setProApiKey = useChatStore((state) => state.setProApiKey);
+  
   const createNewSession = useChatStore((state) => state.createNewSession);
+  const chatSessions = useChatStore((state) => state.chatSessions);
+  const activeSessionId = useChatStore((state) => state.activeSessionId);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [historyVisible, setHistoryVisible] = useState(false);
   const [tempKey, setTempKey] = useState('');
+
+  // Hydrate API Key on Mount
+  useEffect(() => {
+    (async () => {
+      const storedKey = await SecureStore.getItemAsync('PRO_API_KEY');
+      if (storedKey) {
+        setProApiKey(storedKey);
+      }
+    })();
+  }, []);
 
   const handleToggleMode = (selectedMode) => {
     setMode(selectedMode);
@@ -20,12 +35,14 @@ export default function Header() {
     }
   };
 
-  const saveApiKey = () => {
+  const saveApiKey = async () => {
     if (tempKey.trim().length < 20) {
       Alert.alert('Invalid Key', 'Please enter a valid OpenAI API key.');
       return;
     }
-    setProApiKey(tempKey.trim());
+    const key = tempKey.trim();
+    await SecureStore.setItemAsync('PRO_API_KEY', key);
+    setProApiKey(key);
     setModalVisible(false);
   };
 
@@ -33,10 +50,22 @@ export default function Header() {
     setModalVisible(false);
   };
 
+  const loadSession = (sessionId) => {
+    useChatStore.setState({ 
+      activeSessionId: sessionId,
+      messages: chatSessions[sessionId]?.messages || []
+    });
+    setHistoryVisible(false);
+  };
+
   return (
     <>
       <View style={styles.container}>
-        <View style={styles.leftSpacer} />
+        <View style={styles.leftAction}>
+          <TouchableOpacity onPress={() => setHistoryVisible(true)} activeOpacity={0.6} style={styles.iconButton}>
+            <Text style={styles.menuIcon}>≡</Text>
+          </TouchableOpacity>
+        </View>
         
         <View style={styles.segmentedControl}>
           <TouchableOpacity 
@@ -65,6 +94,7 @@ export default function Header() {
         </View>
       </View>
 
+      {/* API Key Modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -101,6 +131,46 @@ export default function Header() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* History Drawer Modal */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={historyVisible}
+        onRequestClose={() => setHistoryVisible(false)}
+      >
+        <View style={styles.historyContainer}>
+          <View style={styles.historyHeader}>
+            <Text style={styles.historyTitle}>Chat History</Text>
+            <TouchableOpacity onPress={() => setHistoryVisible(false)}>
+              <Text style={styles.historyCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <FlatList
+            data={Object.values(chatSessions || {}).reverse()}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => {
+              const snippet = item.messages.length > 0 ? item.messages[0].text.substring(0, 40) + '...' : 'Empty Chat';
+              const date = new Date(parseInt(item.id)).toLocaleString();
+              const isActive = item.id === activeSessionId;
+              
+              return (
+                <TouchableOpacity 
+                  style={[styles.historyItem, isActive && styles.historyItemActive]}
+                  onPress={() => loadSession(item.id)}
+                >
+                  <Text style={styles.historyItemDate}>{date}</Text>
+                  <Text style={styles.historyItemSnippet}>{snippet}</Text>
+                </TouchableOpacity>
+              );
+            }}
+            ListEmptyComponent={
+              <Text style={styles.emptyHistory}>No chat history found.</Text>
+            }
+          />
+        </View>
+      </Modal>
     </>
   );
 }
@@ -116,8 +186,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: 'space-between',
   },
-  leftSpacer: {
+  leftAction: {
     width: 40,
+    alignItems: 'flex-start',
+  },
+  rightAction: {
+    width: 40,
+    alignItems: 'flex-end',
   },
   segmentedControl: {
     flexDirection: 'row',
@@ -134,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   segmentActive: {
-    backgroundColor: '#F3F3F3', // subtle active state
+    backgroundColor: '#F3F3F3',
   },
   segmentText: {
     fontFamily: FONTS.ui,
@@ -150,10 +225,6 @@ const styles = StyleSheet.create({
     width: StyleSheet.hairlineWidth,
     backgroundColor: COLORS.border,
   },
-  rightAction: {
-    width: 40,
-    alignItems: 'flex-end',
-  },
   iconButton: {
     width: 32,
     height: 32,
@@ -168,6 +239,12 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginTop: -2,
   },
+  menuIcon: {
+    fontSize: 22,
+    fontWeight: '300',
+    color: COLORS.textPrimary,
+    marginTop: -4,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -181,11 +258,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderRadius: 8,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
   },
   modalTitle: {
     fontFamily: FONTS.ui,
@@ -236,5 +308,54 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.background,
     fontWeight: '500',
+  },
+  historyContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: COLORS.border,
+  },
+  historyTitle: {
+    fontFamily: FONTS.ui,
+    fontSize: 20,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  historyCloseText: {
+    fontFamily: FONTS.ui,
+    fontSize: 16,
+    color: COLORS.accent,
+    fontWeight: '500',
+  },
+  historyItem: {
+    padding: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: COLORS.border,
+  },
+  historyItemActive: {
+    backgroundColor: '#F9F9F9',
+  },
+  historyItemDate: {
+    fontFamily: FONTS.ui,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 4,
+  },
+  historyItemSnippet: {
+    fontFamily: FONTS.ui,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+  },
+  emptyHistory: {
+    padding: 40,
+    textAlign: 'center',
+    color: COLORS.textSecondary,
+    fontFamily: FONTS.ui,
   }
 });
