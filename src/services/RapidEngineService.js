@@ -13,8 +13,8 @@ export const RapidEngineService = {
     }
 
     const uriPath = ModelManagerService.getModelPath();
-    // Strip the 'file://' prefix for the C++ backend
-    const rawPath = uriPath.replace(/^file:\/\//, '');
+    // Strip the 'file://' prefix but KEEP the leading slash for the absolute path on Android
+    const rawPath = uriPath.replace(/^file:\/\//, '/');
     
     // Hardware accelerated inference via llama.cpp
     llamaContext = await initLlama({
