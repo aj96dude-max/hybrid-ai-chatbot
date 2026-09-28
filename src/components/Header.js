@@ -14,11 +14,10 @@ export default function Header() {
   const [tempKey, setTempKey] = useState('');
 
   const handleToggleMode = (selectedMode) => {
+    setMode(selectedMode);
     if (selectedMode === 'pro' && !proApiKey) {
       setModalVisible(true);
-      return;
     }
-    setMode(selectedMode);
   };
 
   const saveApiKey = () => {
@@ -27,13 +26,11 @@ export default function Header() {
       return;
     }
     setProApiKey(tempKey.trim());
-    setMode('pro');
     setModalVisible(false);
   };
 
   const cancelApiKey = () => {
     setModalVisible(false);
-    setMode('rapid');
   };
 
   return (
