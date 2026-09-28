@@ -1,4 +1,4 @@
-import { LlamaContext } from 'llama.rn';
+import { initLlama } from 'llama.rn';
 import { ModelManagerService } from './ModelManagerService';
 
 let llamaContext = null;
@@ -17,7 +17,7 @@ export const RapidEngineService = {
     const rawPath = uriPath.replace(/^file:\/\//, '');
     
     // Hardware accelerated inference via llama.cpp
-    llamaContext = await LlamaContext.create({
+    llamaContext = await initLlama({
       model: rawPath,
       contextSize: 2048,
     });
