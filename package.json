@@ -17,7 +17,7 @@
     "llama.rn": "^0.2.0",
     "react": "^19.3.0",
     "react-native": "0.86.3",
-    "react-native-mmkv": "^2.12.2",
+    "react-native-mmkv": "^4.3.2",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 
-export const storage = new MMKV({
+export const storage = createMMKV({
   id: 'chatbot-storage',
 });
 
@@ -14,6 +14,6 @@ export const ChatStorageService = {
     return value ?? null;
   },
   removeItem: (name) => {
-    return storage.delete(name);
+    return storage.remove(name);
   },
 };
