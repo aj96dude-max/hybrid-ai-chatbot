@@ -12,9 +12,15 @@ export const ModelManagerService = {
   checkModelExists: async () => {
     try {
       const info = await FileSystem.getInfoAsync(MODEL_PATH);
-      if (info.exists) {
+      // Ensure file exists AND is larger than 100MB to prevent corrupted/partial downloads from crashing the C++ engine
+      if (info.exists && info.size > 100 * 1024 * 1024) {
         useChatStore.getState().setModelStatus('ready');
         return true;
+      }
+      
+      // If it exists but is corrupted/small, delete it so it can redownload
+      if (info.exists) {
+        await FileSystem.deleteAsync(MODEL_PATH, { idempotent: true });
       }
     } catch (e) {
       console.error('File system check error', e);

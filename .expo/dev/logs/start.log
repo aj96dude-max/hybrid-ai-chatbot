@@ -303,3 +303,18 @@
 {"_e":"devserver:start","_t":1790604135669,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
 {"_e":"metro:config","_t":1790604136185,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
 {"_e":"expo:dev-tools-plugin:load","_t":1790604136664,"plugins":[]}
+{"_e":"metro:instantiate","_t":1790604143560,"atlas":false,"workers":6,"host":"::","port":8082}
+{"_e":"metro:bundling:started","_t":1790604178736,"id":"1","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790604178736,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790604178741,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1790604178859,"id":"1","progress":0.01075445816186557,"total":135,"current":14}
+{"_e":"metro:bundling:progress","_t":1790604178960,"id":"1","progress":0.25967029256763696,"total":261,"current":133}
+{"_e":"metro:bundling:progress","_t":1790604179060,"id":"1","progress":0.361388619733369,"total":346,"current":208}
+{"_e":"metro:bundling:progress","_t":1790604179169,"id":"1","progress":0.361388619733369,"total":459,"current":266}
+{"_e":"metro:bundling:progress","_t":1790604179269,"id":"1","progress":0.6049382716049383,"total":522,"current":406}
+{"_e":"metro:bundling:progress","_t":1790604179369,"id":"1","progress":0.7805338374291116,"total":575,"current":508}
+{"_e":"metro:bundling:progress","_t":1790604179469,"id":"1","progress":0.8228061256122512,"total":635,"current":576}
+{"_e":"metro:bundling:progress","_t":1790604179569,"id":"1","progress":0.8386179702268431,"total":736,"current":674}
+{"_e":"metro:bundling:progress","_t":1790604179676,"id":"1","progress":0.8905691839947099,"total":746,"current":704}
+{"_e":"metro:bundling:done","_t":1790604179808,"id":"1","total":746,"ms":1072.4568}
+{"_e":"metro:client_log","_t":1790604200263,"level":"error","data":["RapidEngine Error:","[TypeError: undefined is not a function]"]}
