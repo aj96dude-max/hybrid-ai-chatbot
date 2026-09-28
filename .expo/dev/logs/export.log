@@ -1,0 +1,8 @@
+{"_e":"root:init","_t":1790591124987,"format":"v0-jsonl","version":"57.0.27"}
+{"_e":"env:mode","_t":1790591125184,"nodeEnv":"production","babelEnv":"production","mode":"production"}
+{"_e":"env:load","_t":1790591125187,"mode":"production","files":[],"env":{}}
+{"_e":"devserver:start","_t":1790591125285,"mode":"production","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":true}
+{"_e":"metro:config","_t":1790591125641,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":true,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1790591125820,"atlas":false,"workers":6,"host":null,"port":null}
+{"_e":"metro:bundling:started","_t":1790591126063,"id":"1","platform":"ios","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:started","_t":1790591126064,"id":"2","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
