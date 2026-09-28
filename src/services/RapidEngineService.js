@@ -19,7 +19,9 @@ export const RapidEngineService = {
     // Hardware accelerated inference via llama.cpp
     llamaContext = await initLlama({
       model: rawPath,
-      contextSize: 2048,
+      contextSize: 1024, // Lowered from 2048 to prevent OOM
+      use_mlock: true,   // Lock model in RAM to prevent swapping
+      n_gpu_layers: 0,   // Force CPU execution to prevent GPU OOM on low-end Androids
     });
     
     return true;

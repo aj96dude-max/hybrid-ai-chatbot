@@ -323,3 +323,7 @@
 {"_e":"metro:bundling:done","_t":1790604318988,"id":"3","total":1,"ms":33.8144}
 {"_e":"metro:client_log","_t":1790604328703,"level":"error","data":["RapidEngine Error:","[java.lang.Exception: Failed to initialize context]"]}
 {"_e":"metro:client_log","_t":1790604341736,"level":"error","data":["RapidEngine Error:","[java.lang.Exception: Failed to initialize context]"]}
+{"_e":"metro:bundling:started","_t":1790604410826,"id":"6","platform":"android","environment":null,"entry":"node_modules\\expo\\AppEntry.js"}
+{"_e":"metro:bundling:progress","_t":1790604410826,"id":"6","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1790604410862,"id":"6","total":1,"ms":36.7863}
+{"_e":"metro:client_log","_t":1790604422487,"level":"error","data":["RapidEngine Error:","[java.lang.Exception: Failed to initialize context]"]}
