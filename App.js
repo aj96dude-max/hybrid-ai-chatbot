@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import * as FileSystem from 'expo-file-system/legacy';
 import Header from './src/components/Header';
 import ChatList from './src/components/ChatList';
 import InputBar from './src/components/InputBar';
