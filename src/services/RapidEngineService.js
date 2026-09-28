@@ -18,7 +18,8 @@ export const RapidEngineService = {
     // VERIFY EXACT FILE SIZE BEFORE INITIALIZING
     const FileSystem = require('expo-file-system/legacy');
     const info = await FileSystem.getInfoAsync(uriPath);
-    if (!info.exists || info.size < 390 * 1024 * 1024) {
+    // The exact size of Qwen1.5-0.5B-Chat Q4_K_M is 388MB.
+    if (!info.exists || info.size < 380 * 1024 * 1024) {
       throw new Error(`Model corrupted. Size is only ${Math.round((info.size || 0)/1024/1024)}MB. Please tap Reset Engine and re-download.`);
     }
 
