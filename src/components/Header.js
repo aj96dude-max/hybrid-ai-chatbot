@@ -142,9 +142,20 @@ export default function Header() {
         <View style={styles.historyContainer}>
           <View style={styles.historyHeader}>
             <Text style={styles.historyTitle}>Chat History</Text>
-            <TouchableOpacity onPress={() => setHistoryVisible(false)}>
-              <Text style={styles.historyCloseText}>Close</Text>
-            </TouchableOpacity>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity onPress={async () => {
+                const FileSystem = require('expo-file-system/legacy');
+                const path = `${FileSystem.documentDirectory}rapid_model_q4_k_m.gguf`;
+                await FileSystem.deleteAsync(path, { idempotent: true });
+                useChatStore.getState().setModelStatus('missing');
+                Alert.alert('Engine Reset', 'The offline model has been deleted and will re-download on next prompt.');
+              }} style={{marginRight: 16}}>
+                <Text style={[styles.historyCloseText, {color: COLORS.textSecondary}]}>Reset Engine</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setHistoryVisible(false)}>
+                <Text style={styles.historyCloseText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           
           <FlatList
