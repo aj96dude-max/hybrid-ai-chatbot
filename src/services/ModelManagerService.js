@@ -26,10 +26,17 @@ export const ModelManagerService = {
   downloadModel: async () => {
     useChatStore.getState().setModelStatus('downloading');
     
+    let lastUpdateTime = 0;
+    
     const callback = (downloadProgress) => {
-      const progress = downloadProgress.totalBytesWritten;
-      const total = downloadProgress.totalBytesExpectedToWrite;
-      useChatStore.getState().setDownloadProgress(progress, total);
+      const now = Date.now();
+      // Throttle state updates to every 250ms to prevent freezing the JS thread
+      if (now - lastUpdateTime >= 250) {
+        const progress = downloadProgress.totalBytesWritten;
+        const total = downloadProgress.totalBytesExpectedToWrite;
+        useChatStore.getState().setDownloadProgress(progress, total);
+        lastUpdateTime = now;
+      }
     };
 
     const downloadResumable = FileSystem.createDownloadResumable(

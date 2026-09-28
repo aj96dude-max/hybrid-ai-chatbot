@@ -7,12 +7,12 @@ export const ProEngineService = {
     }));
 
     try {
-      // In production, this points to your backend or secure API gateway
-      const API_KEY = 'YOUR_CLOUD_API_KEY';
+      const store = require('../store/useChatStore').useChatStore;
+      const API_KEY = store.getState().proApiKey;
 
       // SIMULATION FOR TESTING: If the user hasn't put in an API key yet, simulate a response
-      if (API_KEY === 'YOUR_CLOUD_API_KEY') {
-        const fakeResponse = "Hello! I am the Pro Cloud Engine. You need to replace 'YOUR_CLOUD_API_KEY' in ProEngineService.js with a real OpenAI API key to get real answers!";
+      if (!API_KEY || API_KEY === 'YOUR_CLOUD_API_KEY') {
+        const fakeResponse = "Hello! I am the Pro Cloud Engine. You need to enter a real OpenAI API key to get real answers!";
         const chunks = fakeResponse.split(' ');
         
         for (const word of chunks) {
