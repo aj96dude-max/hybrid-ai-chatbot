@@ -26,22 +26,35 @@ export const RapidEngineService = {
     // Hardware accelerated inference via llama.cpp
     llamaContext = await initLlama({
       model: rawPath,
-      contextSize: 512,  
-      n_ctx: 512,        // In case the native bridge expects n_ctx directly
+      contextSize: 2048,  
+      n_ctx: 2048,        
       n_gpu_layers: 0,   
-      use_mlock: false,  // EXPLICITLY set to false (defaults to true natively and crashes Android!)
-      use_mmap: false    // EXPLICITLY set to false (memory mapping can fail on strict Android OEMs)
+      use_mlock: false,  
+      use_mmap: false    
     });
     
     return true;
+  },
+
+  stop: async () => {
+    if (llamaContext) {
+      try {
+        await llamaContext.stopCompletion();
+      } catch (e) {
+        console.warn('llama context stopCompletion error', e);
+      }
+    }
   },
 
   streamCompletion: async (messages, onToken) => {
     try {
       await RapidEngineService.initContext();
       
+      const CUSTOMER_SUPPORT_PROMPT = "You are an elite customer support agent. Your goal is to resolve user queries efficiently, politely, and accurately. Do not answer questions outside of customer support, billing, troubleshooting, and product guidance. If you do not know the answer, tell the user you are transferring them to a human agent.";
+      
+      let prompt = `<|im_start|>system\n${CUSTOMER_SUPPORT_PROMPT}<|im_end|>\n`;
+      
       // Formatting context for ChatML format (assuming Qwen/Llama-3 architecture)
-      let prompt = '';
       messages.forEach(m => {
         const role = m.role === 'user' ? 'user' : 'assistant';
         prompt += `<|im_start|>${role}\n${m.text}<|im_end|>\n`;
@@ -60,7 +73,7 @@ export const RapidEngineService = {
       
     } catch (error) {
       console.error('RapidEngine Error:', error);
-      onToken('\n[Rapid Mode Error: ' + error.message + ']');
+      throw error; // Rethrow to router
     }
   }
 };

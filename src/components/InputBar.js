@@ -15,6 +15,10 @@ export default function InputBar() {
     await HybridRouterService.submitPrompt(prompt);
   };
 
+  const handleStop = () => {
+    HybridRouterService.abortGeneration();
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -26,18 +30,24 @@ export default function InputBar() {
         multiline
         editable={!isTyping}
       />
-      <TouchableOpacity 
-        style={[styles.sendButton, isTyping && styles.sendButtonDisabled]} 
-        onPress={handleSend}
-        activeOpacity={0.7}
-        disabled={isTyping}
-      >
-        {isTyping ? (
-          <ActivityIndicator color={COLORS.background} size="small" />
-        ) : (
+      {isTyping ? (
+        <TouchableOpacity 
+          style={styles.stopButton} 
+          onPress={handleStop}
+          activeOpacity={0.7}
+        >
+          <View style={styles.stopIcon} />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity 
+          style={[styles.sendButton, text.trim() === '' && styles.sendButtonDisabled]} 
+          onPress={handleSend}
+          activeOpacity={0.7}
+          disabled={text.trim() === ''}
+        >
           <Text style={styles.sendIcon}>↑</Text>
-        )}
-      </TouchableOpacity>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -83,5 +93,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     fontFamily: FONTS.ui,
+  },
+  stopButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textPrimary,
+    borderRadius: 4,
+    backgroundColor: COLORS.background,
+  },
+  stopIcon: {
+    width: 12,
+    height: 12,
+    backgroundColor: COLORS.textPrimary,
   }
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, FlatList, Text, StyleSheet } from 'react-native';
 import { useChatStore } from '../store/useChatStore';
 import MessageItem from './MessageItem';
@@ -9,6 +9,16 @@ export default function ChatList() {
   const modelStatus = useChatStore((state) => state.modelStatus);
   const progress = useChatStore((state) => state.downloadProgress);
   const total = useChatStore((state) => state.downloadTotal);
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Small timeout to allow layout calculation
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages.length, messages[messages.length - 1]?.text.length]);
 
   const renderDownloadBanner = () => {
     if (modelStatus !== 'downloading') return null;
@@ -31,11 +41,14 @@ export default function ChatList() {
     <View style={styles.container}>
       {renderDownloadBanner()}
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <MessageItem message={item} />}
         style={styles.list}
         contentContainerStyle={styles.content}
+        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
       />
     </View>
   );

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, KeyboardAvoidingView, Platform, Alert, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import * as SecureStore from 'expo-secure-store';
-import * as FileSystem from 'expo-file-system/legacy';
 import { useChatStore } from '../store/useChatStore';
 import { COLORS, FONTS } from '../theme/colors';
+import SettingsModal from './SettingsModal';
 
 export default function Header() {
   const mode = useChatStore((state) => state.mode);
@@ -15,9 +16,8 @@ export default function Header() {
   const chatSessions = useChatStore((state) => state.chatSessions);
   const activeSessionId = useChatStore((state) => state.activeSessionId);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
-  const [tempKey, setTempKey] = useState('');
 
   // Hydrate API Key on Mount
   useEffect(() => {
@@ -32,23 +32,8 @@ export default function Header() {
   const handleToggleMode = (selectedMode) => {
     setMode(selectedMode);
     if (selectedMode === 'pro' && !proApiKey) {
-      setModalVisible(true);
+      setSettingsVisible(true);
     }
-  };
-
-  const saveApiKey = async () => {
-    if (tempKey.trim().length < 20) {
-      Alert.alert('Invalid Key', 'Please enter a valid OpenAI API key.');
-      return;
-    }
-    const key = tempKey.trim();
-    await SecureStore.setItemAsync('PRO_API_KEY', key);
-    setProApiKey(key);
-    setModalVisible(false);
-  };
-
-  const cancelApiKey = () => {
-    setModalVisible(false);
   };
 
   const loadSession = (sessionId) => {
@@ -89,49 +74,20 @@ export default function Header() {
         </View>
 
         <View style={styles.rightAction}>
+          <TouchableOpacity onPress={() => setSettingsVisible(true)} activeOpacity={0.6} style={[styles.iconButton, { marginRight: 8 }]}>
+            <Text style={styles.iconText}>⚙</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={createNewSession} activeOpacity={0.6} style={styles.iconButton}>
             <Text style={styles.iconText}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* API Key Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={cancelApiKey}
-      >
-        <KeyboardAvoidingView 
-          style={styles.modalOverlay}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Pro Cloud Engine</Text>
-            <Text style={styles.modalSubtitle}>Please enter your OpenAI API key to enable Pro mode.</Text>
-            
-            <TextInput
-              style={styles.input}
-              placeholder="sk-..."
-              placeholderTextColor={COLORS.textSecondary}
-              value={tempKey}
-              onChangeText={setTempKey}
-              autoCapitalize="none"
-              autoCorrect={false}
-              secureTextEntry
-            />
-            
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelButton} onPress={cancelApiKey}>
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveButton} onPress={saveApiKey}>
-                <Text style={styles.saveText}>Save & Enable</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+      {/* Settings Modal */}
+      <SettingsModal 
+        visible={settingsVisible} 
+        onClose={() => setSettingsVisible(false)} 
+      />
 
       {/* History Drawer Modal */}
       <Modal
@@ -143,30 +99,16 @@ export default function Header() {
         <View style={styles.historyContainer}>
           <View style={styles.historyHeader}>
             <Text style={styles.historyTitle}>Chat History</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TouchableOpacity onPress={async () => {
-                try {
-                  const path = `${FileSystem.documentDirectory}rapid_model_q4_k_m.gguf`;
-                  await FileSystem.deleteAsync(path, { idempotent: true });
-                  useChatStore.getState().setModelStatus('missing');
-                  Alert.alert('Engine Reset', 'The offline model has been deleted and will re-download on next prompt.');
-                } catch (e) {
-                  Alert.alert('Error', 'Failed to delete file: ' + e.message);
-                }
-              }} style={{marginRight: 16}}>
-                <Text style={[styles.historyCloseText, {color: COLORS.textSecondary}]}>Reset Engine</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setHistoryVisible(false)}>
-                <Text style={styles.historyCloseText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => setHistoryVisible(false)}>
+              <Text style={styles.historyCloseText}>Close</Text>
+            </TouchableOpacity>
           </View>
           
-          <FlatList
+          <SwipeListView
             data={Object.values(chatSessions || {}).reverse()}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
-              const snippet = item.messages.length > 0 ? item.messages[0].text.substring(0, 40) + '...' : 'Empty Chat';
+              const snippet = item.title ? item.title : (item.messages.length > 0 ? item.messages[0].text.substring(0, 40) + '...' : 'Empty Chat');
               const date = new Date(parseInt(item.id)).toLocaleString();
               const isActive = item.id === activeSessionId;
               
@@ -175,22 +117,26 @@ export default function Header() {
                   <TouchableOpacity 
                     style={{ flex: 1 }}
                     onPress={() => loadSession(item.id)}
+                    activeOpacity={1}
                   >
                     <Text style={styles.historyItemDate}>{date}</Text>
                     <Text style={styles.historyItemSnippet}>{snippet}</Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    onPress={() => {
-                      useChatStore.getState().deleteSession(item.id);
-                    }}
-                    style={{ padding: 8, justifyContent: 'center' }}
-                  >
-                    <Text style={{ color: 'red', fontFamily: FONTS.ui }}>Delete</Text>
-                  </TouchableOpacity>
                 </View>
               );
             }}
+            renderHiddenItem={({ item }) => (
+              <View style={styles.historyHiddenItem}>
+                <TouchableOpacity 
+                  style={styles.historyDeleteButton}
+                  onPress={() => useChatStore.getState().deleteSession(item.id)}
+                >
+                  <Text style={styles.historyDeleteText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            rightOpenValue={-75}
+            disableRightSwipe
             ListEmptyComponent={
               <Text style={styles.emptyHistory}>No chat history found.</Text>
             }
@@ -217,8 +163,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   rightAction: {
-    width: 40,
-    alignItems: 'flex-end',
+    width: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   segmentedControl: {
     flexDirection: 'row',
@@ -271,70 +219,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginTop: -4,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
-    padding: 24,
-  },
-  modalTitle: {
-    fontFamily: FONTS.ui,
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontFamily: FONTS.ui,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COLORS.border,
-    borderRadius: 6,
-    padding: 12,
-    fontSize: 15,
-    fontFamily: FONTS.ui,
-    color: COLORS.textPrimary,
-    marginBottom: 24,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  cancelButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginRight: 8,
-  },
-  cancelText: {
-    fontFamily: FONTS.ui,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  saveButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: COLORS.textPrimary,
-    borderRadius: 6,
-  },
-  saveText: {
-    fontFamily: FONTS.ui,
-    fontSize: 14,
-    color: COLORS.background,
-    fontWeight: '500',
-  },
+
   historyContainer: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -365,6 +250,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: COLORS.border,
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
   historyItemActive: {
     backgroundColor: '#F9F9F9',
@@ -379,6 +265,23 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.ui,
     fontSize: 15,
     color: COLORS.textPrimary,
+  },
+  historyHiddenItem: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    backgroundColor: '#FF3B30',
+  },
+  historyDeleteButton: {
+    width: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  historyDeleteText: {
+    color: COLORS.background,
+    fontFamily: FONTS.ui,
+    fontWeight: '600',
+    fontSize: 14,
   },
   emptyHistory: {
     padding: 40,
