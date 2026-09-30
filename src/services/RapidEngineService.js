@@ -1,79 +1,99 @@
-import { initLlama } from 'llama.rn';
-import { ModelManagerService } from './ModelManagerService';
+const DEMO_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
 
-let llamaContext = null;
+const SYSTEM_PROMPTS = {
+  healthcare: "Strict HIPAA compliance. Refuse medical advice. Focus on EOB, Medicare, and copays.",
+  insurance: "Focus on de-escalation, claims filing, collision vs comprehensive, and roadside dispatch.",
+  limo: "Focus on logistics, passenger limits, luggage capacity, and hourly minimums.",
+  food: "Focus on rapid appeasement, refunds, missing items, and driver tracking."
+};
+
+let abortController = null;
 
 export const RapidEngineService = {
-  initContext: async () => {
-    if (llamaContext) return true;
-    
-    const exists = await ModelManagerService.checkModelExists();
-    if (!exists) {
-      throw new Error('Model is not downloaded.');
-    }
-
-    const uriPath = ModelManagerService.getModelPath();
-    const rawPath = uriPath.replace('file://', '');
-    
-    // VERIFY EXACT FILE SIZE BEFORE INITIALIZING
-    const FileSystem = require('expo-file-system/legacy');
-    const info = await FileSystem.getInfoAsync(uriPath);
-    // The exact size of Qwen1.5-0.5B-Chat Q4_K_M is 388MB.
-    if (!info.exists || info.size < 380 * 1024 * 1024) {
-      throw new Error(`Model corrupted. Size is only ${Math.round((info.size || 0)/1024/1024)}MB. Please tap Reset Engine and re-download.`);
-    }
-
-    // Hardware accelerated inference via llama.cpp
-    llamaContext = await initLlama({
-      model: rawPath,
-      contextSize: 2048,  
-      n_ctx: 2048,        
-      n_gpu_layers: 0,   
-      use_mlock: false,  
-      use_mmap: false    
-    });
-    
-    return true;
-  },
-
   stop: async () => {
-    if (llamaContext) {
-      try {
-        await llamaContext.stopCompletion();
-      } catch (e) {
-        console.warn('llama context stopCompletion error', e);
-      }
+    if (abortController) {
+      abortController.abort();
+      abortController = null;
     }
   },
 
   streamCompletion: async (messages, onToken) => {
     try {
-      await RapidEngineService.initContext();
+      const store = require('../store/useChatStore').useChatStore;
+      const activeDomain = store.getState().activeDomain;
       
-      const CUSTOMER_SUPPORT_PROMPT = "You are an elite customer support agent. Your goal is to resolve user queries efficiently, politely, and accurately. Do not answer questions outside of customer support, billing, troubleshooting, and product guidance. If you do not know the answer, tell the user you are transferring them to a human agent.";
+      const systemPrompt = SYSTEM_PROMPTS[activeDomain] || SYSTEM_PROMPTS.healthcare;
       
-      let prompt = `<|im_start|>system\n${CUSTOMER_SUPPORT_PROMPT}<|im_end|>\n`;
-      
-      // Formatting context for ChatML format (assuming Qwen/Llama-3 architecture)
-      messages.forEach(m => {
-        const role = m.role === 'user' ? 'user' : 'assistant';
-        prompt += `<|im_start|>${role}\n${m.text}<|im_end|>\n`;
-      });
-      prompt += '<|im_start|>assistant\n';
+      const formattedMessages = [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: m.text
+        }))
+      ];
 
-      await llamaContext.completion({
-        prompt,
-        n_predict: 512,
-        temperature: 0.7,
-      }, (data) => {
-        if (data.token) {
-          onToken(data.token);
-        }
+      abortController = new AbortController();
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEMO_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-20b',
+          messages: formattedMessages,
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 512
+        }),
+        signal: abortController.signal
       });
-      
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Groq API Error: ${response.status} - ${errorText}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        
+        let parts = buffer.split('\n\n');
+        
+        buffer = parts.pop() || '';
+
+        for (const part of parts) {
+          if (part.trim() === '') continue;
+          if (part.trim() === 'data: [DONE]') return;
+          
+          if (part.startsWith('data: ')) {
+            try {
+              const jsonStr = part.replace('data: ', '').trim();
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices[0]?.delta?.content;
+              if (content) {
+                onToken(content);
+              }
+            } catch (err) {
+              console.warn('Failed to parse SSE chunk:', part);
+            }
+          }
+        }
+      }
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Stream aborted manually.');
+        return;
+      }
       console.error('RapidEngine Error:', error);
-      throw error; // Rethrow to router
+      throw error;
     }
   }
 };
