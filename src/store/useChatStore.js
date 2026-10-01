@@ -6,7 +6,6 @@ export const useChatStore = create(
   persist(
     (set, get) => ({
       mode: 'rapid', // 'pro' | 'rapid'
-      proApiKey: null, 
       systemPrompt: 'You are a helpful, smart, kind, and efficient AI assistant. You always fulfill the user\'s requests to the best of your ability.',
       
       modelStatus: 'missing',
@@ -20,7 +19,6 @@ export const useChatStore = create(
       isTyping: false,
       
       setMode: (mode) => set({ mode }),
-      setProApiKey: (key) => set({ proApiKey: key }),
       setSystemPrompt: (prompt) => set({ systemPrompt: prompt }),
       setIsTyping: (isTyping) => set({ isTyping }),
       setModelStatus: (modelStatus) => set({ modelStatus }),

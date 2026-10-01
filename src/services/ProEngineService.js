@@ -1,42 +1,27 @@
+const DEMO_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
+
+const PRO_SYSTEM_PROMPT = "You are an expert consultant and advanced AI assistant. Provide comprehensive, highly detailed explanations. Use markdown, bullet points, and deep reasoning to generate thorough content exactly like ChatGPT would. Explore nuances and provide next-level insights.";
+
 export const ProEngineService = {
   streamCompletion: async (messages, onToken, abortSignal) => {
-    // Convert internal message format to OpenAI compatible API format
-    const apiMessages = messages.map(m => ({
-      role: m.role === 'user' ? 'user' : 'assistant',
-      content: m.text,
-    }));
-
     try {
-      const store = require('../store/useChatStore').useChatStore;
-      const API_KEY = store.getState().proApiKey;
-      const systemPrompt = store.getState().systemPrompt;
-      
-      if (systemPrompt) {
-        apiMessages.unshift({ role: 'system', content: systemPrompt });
-      }
-
-      // SIMULATION FOR TESTING: If the user hasn't put in an API key yet, simulate a response
-      if (!API_KEY || API_KEY === 'YOUR_CLOUD_API_KEY') {
-        const fakeResponse = "Hello! I am the Pro Cloud Engine. You need to enter a real OpenAI API key to get real answers!";
-        const chunks = fakeResponse.split(' ');
-        
-        for (const word of chunks) {
-          if (abortSignal?.aborted) return;
-          await new Promise(r => setTimeout(r, 100)); // simulate network delay
-          onToken(word + ' ');
-        }
-        return;
-      }
+      const formattedMessages = [
+        { role: 'system', content: PRO_SYSTEM_PROMPT },
+        ...messages.map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: m.text,
+        }))
+      ];
 
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`,
+          'Authorization': `Bearer ${DEMO_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
-          messages: apiMessages,
+          model: 'openai/gpt-oss-120b',
+          messages: formattedMessages,
           stream: true,
         }),
         signal: abortSignal
@@ -56,23 +41,25 @@ export const ProEngineService = {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
         
-        // Keep the last incomplete line in the buffer
-        buffer = lines.pop();
+        let parts = buffer.split('\n\n');
+        
+        buffer = parts.pop() || '';
 
-        for (const line of lines) {
-          if (line.trim() === '') continue;
-          if (line.includes('[DONE]')) return;
-          if (line.startsWith('data: ')) {
+        for (const part of parts) {
+          if (part.trim() === '') continue;
+          if (part.trim() === 'data: [DONE]') return;
+          
+          if (part.startsWith('data: ')) {
             try {
-              const data = JSON.parse(line.replace(/^data: /, ''));
-              const token = data.choices[0]?.delta?.content;
-              if (token) {
-                onToken(token);
+              const jsonStr = part.replace('data: ', '').trim();
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices[0]?.delta?.content;
+              if (content) {
+                onToken(content);
               }
-            } catch (e) {
-              console.warn('Failed to parse SSE chunk:', line);
+            } catch (err) {
+              console.warn('Failed to parse SSE chunk:', part);
             }
           }
         }

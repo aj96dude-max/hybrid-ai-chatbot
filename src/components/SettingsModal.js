@@ -6,30 +6,18 @@ import { useChatStore } from '../store/useChatStore';
 import { COLORS, FONTS } from '../theme/colors';
 
 export default function SettingsModal({ visible, onClose }) {
-  const proApiKey = useChatStore((state) => state.proApiKey);
-  const setProApiKey = useChatStore((state) => state.setProApiKey);
   const systemPrompt = useChatStore((state) => state.systemPrompt);
   const setSystemPrompt = useChatStore((state) => state.setSystemPrompt);
   
-  const [tempKey, setTempKey] = useState('');
   const [tempPrompt, setTempPrompt] = useState(systemPrompt || '');
 
   useEffect(() => {
     if (visible) {
-      setTempKey(proApiKey || '');
       setTempPrompt(systemPrompt || '');
     }
-  }, [visible, proApiKey, systemPrompt]);
+  }, [visible, systemPrompt]);
 
   const saveSettings = async () => {
-    if (tempKey.trim() !== '') {
-      await SecureStore.setItemAsync('PRO_API_KEY', tempKey.trim());
-      setProApiKey(tempKey.trim());
-    } else {
-      await SecureStore.deleteItemAsync('PRO_API_KEY');
-      setProApiKey(null);
-    }
-    
     setSystemPrompt(tempPrompt.trim());
     onClose();
   };
@@ -103,21 +91,6 @@ export default function SettingsModal({ visible, onClose }) {
         >
           <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
             
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Pro Cloud Engine (API Key)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="sk-..."
-                placeholderTextColor={COLORS.textSecondary}
-                value={tempKey}
-                onChangeText={setTempKey}
-                autoCapitalize="none"
-                autoCorrect={false}
-                secureTextEntry
-              />
-              <Text style={styles.description}>Leave blank to remove your API key.</Text>
-            </View>
-
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>System Prompt</Text>
               <TextInput

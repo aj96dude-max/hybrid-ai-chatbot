@@ -1,11 +1,6 @@
 const DEMO_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
 
-const SYSTEM_PROMPTS = {
-  healthcare: "Strict HIPAA compliance. Refuse medical advice. Focus on EOB, Medicare, and copays.",
-  insurance: "Focus on de-escalation, claims filing, collision vs comprehensive, and roadside dispatch.",
-  limo: "Focus on logistics, passenger limits, luggage capacity, and hourly minimums.",
-  food: "Focus on rapid appeasement, refunds, missing items, and driver tracking."
-};
+const RAPID_SYSTEM_PROMPT = "You are an ultra-fast, concise customer support agent. Provide immediate, accurate answers in 2 to 3 sentences maximum. Do not provide long explanations.";
 
 let abortController = null;
 
@@ -19,13 +14,8 @@ export const RapidEngineService = {
 
   streamCompletion: async (messages, onToken) => {
     try {
-      const store = require('../store/useChatStore').useChatStore;
-      const activeDomain = store.getState().activeDomain;
-      
-      const systemPrompt = SYSTEM_PROMPTS[activeDomain] || SYSTEM_PROMPTS.healthcare;
-      
       const formattedMessages = [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: RAPID_SYSTEM_PROMPT },
         ...messages.map(m => ({
           role: m.role === 'user' ? 'user' : 'assistant',
           content: m.text

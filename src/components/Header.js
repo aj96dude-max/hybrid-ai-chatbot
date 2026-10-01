@@ -9,8 +9,6 @@ import SettingsModal from './SettingsModal';
 export default function Header() {
   const mode = useChatStore((state) => state.mode);
   const setMode = useChatStore((state) => state.setMode);
-  const proApiKey = useChatStore((state) => state.proApiKey);
-  const setProApiKey = useChatStore((state) => state.setProApiKey);
   
   const createNewSession = useChatStore((state) => state.createNewSession);
   const chatSessions = useChatStore((state) => state.chatSessions);
@@ -19,21 +17,8 @@ export default function Header() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
 
-  // Hydrate API Key on Mount
-  useEffect(() => {
-    (async () => {
-      const storedKey = await SecureStore.getItemAsync('PRO_API_KEY');
-      if (storedKey) {
-        setProApiKey(storedKey);
-      }
-    })();
-  }, []);
-
   const handleToggleMode = (selectedMode) => {
     setMode(selectedMode);
-    if (selectedMode === 'pro' && !proApiKey) {
-      setSettingsVisible(true);
-    }
   };
 
   const loadSession = (sessionId) => {
