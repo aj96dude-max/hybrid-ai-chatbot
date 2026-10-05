@@ -66,12 +66,23 @@ export default function SettingsModal({ visible, onClose }) {
           text: 'Clear',
           style: 'destructive',
           onPress: () => {
-            useChatStore.getState().clearHistory();
-            // We also need to clear all sessions
+            const newId = Date.now().toString();
+            const initialMessage = {
+              id: `msg-${newId}`,
+              role: 'bot',
+              text: 'Hello! I am your support assistant. How can I help you today?'
+            };
+            
             useChatStore.setState({
-              chatSessions: {},
-              activeSessionId: Date.now().toString(),
-              messages: []
+              chatSessions: {
+                [newId]: { id: newId, title: `Ticket #${newId.slice(-4)}`, messages: [initialMessage] }
+              },
+              activeSessionId: newId,
+              messages: [initialMessage]
+            });
+            
+            import('../services/ChatStorageService').then(({ ChatStorageService }) => {
+               ChatStorageService.removeItem('hybrid-chat-storage-v4');
             });
             Alert.alert('Success', 'All chat history cleared.');
           }
@@ -224,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   dangerText: {
-    color: '#E53E3E',
+    color: '#FF3333',
   },
   saveButton: {
     paddingVertical: 16,

@@ -20,7 +20,7 @@ export const ProEngineService = {
           'Authorization': `Bearer ${DEMO_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'openai/gpt-oss-120b',
+          model: 'llama3-70b-8192',
           messages: formattedMessages,
           stream: true,
         }),
@@ -36,7 +36,9 @@ export const ProEngineService = {
       let buffer = '';
 
       while (true) {
-        if (abortSignal?.aborted) break;
+        if (abortSignal?.aborted) {
+          break;
+        }
         const { value, done } = await reader.read();
         if (done) break;
 

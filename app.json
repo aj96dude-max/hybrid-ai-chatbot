@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Hybrid AI Chatbot",
-    "slug": "hybrid-ai-chatbot",
+    "slug": "bettercallchat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -32,7 +32,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "d4650e36-938b-4336-951b-1564ad44db25"
+        "projectId": "660ee485-8698-47c5-8584-ecdbd5aac4e4"
       }
     }
   }

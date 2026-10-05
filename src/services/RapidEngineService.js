@@ -31,7 +31,7 @@ export const RapidEngineService = {
           'Authorization': `Bearer ${DEMO_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'openai/gpt-oss-20b',
+          model: 'mixtral-8x7b-32768',
           messages: formattedMessages,
           stream: true,
           temperature: 0.7,
@@ -50,6 +50,9 @@ export const RapidEngineService = {
       let buffer = '';
 
       while (true) {
+        if (!abortController || abortController.signal.aborted) {
+          break;
+        }
         const { done, value } = await reader.read();
         if (done) break;
 

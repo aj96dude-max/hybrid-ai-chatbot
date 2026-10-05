@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, FlatList, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useChatStore } from '../store/useChatStore';
 import MessageItem from './MessageItem';
 import { COLORS, FONTS } from '../theme/colors';
@@ -11,14 +12,8 @@ export default function ChatList() {
   const total = useChatStore((state) => state.downloadTotal);
   const flatListRef = useRef(null);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      // Small timeout to allow layout calculation
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  }, [messages.length, messages[messages.length - 1]?.text.length]);
+  // Reverse messages for the inverted FlatList to handle native bottom-up scrolling
+  const reversedMessages = [...messages].reverse();
 
   const renderDownloadBanner = () => {
     if (modelStatus !== 'downloading') return null;
@@ -40,16 +35,25 @@ export default function ChatList() {
   return (
     <View style={styles.container}>
       {renderDownloadBanner()}
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MessageItem message={item} />}
-        style={styles.list}
-        contentContainerStyle={styles.content}
-        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-        onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
-      />
+      
+      {messages.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View style={styles.logoCircle}>
+            <Ionicons name="chatbubbles" size={70} color="#fff" />
+          </View>
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={reversedMessages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <MessageItem message={item} />}
+          style={styles.list}
+          contentContainerStyle={styles.content}
+          inverted={true}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 }
@@ -57,7 +61,20 @@ export default function ChatList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#fff',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoCircle: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#1877F2',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   list: {
     flex: 1,
